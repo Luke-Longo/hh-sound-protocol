@@ -2,8 +2,8 @@
 
 pragma solidity ^0.8.16;
 
-import { OwnableRoles } from "solady/auth/OwnableRoles.sol";
-import { ISoundFeeRegistry } from "@core/interfaces/ISoundFeeRegistry.sol";
+import {OwnableRoles} from "solady/src/auth/OwnableRoles.sol";
+import {ISoundFeeRegistry} from "./interfaces/ISoundFeeRegistry.sol";
 
 /**
  * @title SoundFeeRegistry
@@ -66,7 +66,11 @@ contract SoundFeeRegistry is ISoundFeeRegistry, OwnableRoles {
     /**
      * @inheritdoc ISoundFeeRegistry
      */
-    function setPlatformFeeBPS(uint16 platformFeeBPS_) external onlyOwner onlyValidPlatformFeeBPS(platformFeeBPS_) {
+    function setPlatformFeeBPS(uint16 platformFeeBPS_)
+        external
+        onlyOwner
+        onlyValidPlatformFeeBPS(platformFeeBPS_)
+    {
         platformFeeBPS = platformFeeBPS_;
         emit PlatformFeeSet(platformFeeBPS_);
     }
@@ -77,7 +81,9 @@ contract SoundFeeRegistry is ISoundFeeRegistry, OwnableRoles {
     function platformFee(uint128 requiredEtherValue) external view returns (uint128 fee) {
         // Won't overflow, as `requiredEtherValue` is 128 bits, and `platformFeeBPS` is 16 bits.
         unchecked {
-            fee = uint128((uint256(requiredEtherValue) * uint256(platformFeeBPS)) / uint256(_MAX_BPS));
+            fee = uint128(
+                (uint256(requiredEtherValue) * uint256(platformFeeBPS)) / uint256(_MAX_BPS)
+            );
         }
     }
 

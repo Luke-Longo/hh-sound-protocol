@@ -1,52 +1,31 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.16;
 
-/*
-                 ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-               ▒███████████████████████████████████████████████████████████
-               ▒███████████████████████████████████████████████████████████
- ▒▓▓▓▓▓▓▓▓▓▓▓▓▓████████████████▓▓▓▓▓▓▓▓▓▓▓▓▓▓██████████████████████████████▓▒▒▒▒▒▒▒▒▒▒▒▒▒
- █████████████████████████████▓              ████████████████████████████████████████████
- █████████████████████████████▓              ████████████████████████████████████████████
- █████████████████████████████▓               ▒▒▒▒▒▒▒▒▒▒▒▒▒██████████████████████████████
- █████████████████████████████▓                            ▒█████████████████████████████
- █████████████████████████████▓                             ▒████████████████████████████
- █████████████████████████████████████████████████████████▓
- ███████████████████████████████████████████████████████████
- ███████████████████████████████████████████████████████████▒
-                              ███████████████████████████████████████████████████████████▒
-                              ▓██████████████████████████████████████████████████████████▒
-                               ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓███████████████████████████████▒
- █████████████████████████████                             ▒█████████████████████████████▒
- ██████████████████████████████                            ▒█████████████████████████████▒
- ██████████████████████████████▓▒▒▒▒▒▒▒▒▒▒▒▒▒              ▒█████████████████████████████▒
- ████████████████████████████████████████████▒             ▒█████████████████████████████▒
- ████████████████████████████████████████████▒             ▒█████████████████████████████▒
- ▒▒▒▒▒▒▒▒▒▒▒▒▒▒███████████████████████████████▓▓▓▓▓▓▓▓▓▓▓▓▓███████████████▓▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-               ▓██████████████████████████████████████████████████████████▒
-               ▓██████████████████████████████████████████████████████████
-*/
+import {IERC721AUpgradeable} from "erc721a-upgradeable/contracts/interfaces/IERC721AUpgradeable.sol";
+import {ERC721AUpgradeable, ERC721AStorage} from "erc721a-upgradeable/contracts/ERC721AUpgradeable.sol";
+import {ERC721AQueryableUpgradeable} from "erc721a-upgradeable/contracts/extensions/ERC721AQueryableUpgradeable.sol";
+import {ERC721ABurnableUpgradeable} from "erc721a-upgradeable/contracts/extensions/ERC721ABurnableUpgradeable.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {IERC2981Upgradeable} from "@openzeppelin/contracts-upgradeable/interfaces/IERC2981Upgradeable.sol";
+import {SafeTransferLib} from "solady/src/utils/SafeTransferLib.sol";
+import {FixedPointMathLib} from "solady/src/utils/FixedPointMathLib.sol";
+import {OwnableRoles} from "solady/src/auth/OwnableRoles.sol";
 
-import { IERC721AUpgradeable } from "chiru-labs/ERC721A-Upgradeable/IERC721AUpgradeable.sol";
-import { ERC721AUpgradeable, ERC721AStorage } from "chiru-labs/ERC721A-Upgradeable/ERC721AUpgradeable.sol";
-import { ERC721AQueryableUpgradeable } from "chiru-labs/ERC721A-Upgradeable/extensions/ERC721AQueryableUpgradeable.sol";
-import { ERC721ABurnableUpgradeable } from "chiru-labs/ERC721A-Upgradeable/extensions/ERC721ABurnableUpgradeable.sol";
-import { IERC20 } from "openzeppelin/token/ERC20/IERC20.sol";
-import { IERC2981Upgradeable } from "openzeppelin-upgradeable/interfaces/IERC2981Upgradeable.sol";
-import { SafeTransferLib } from "solady/utils/SafeTransferLib.sol";
-import { FixedPointMathLib } from "solady/utils/FixedPointMathLib.sol";
-import { OwnableRoles } from "solady/auth/OwnableRoles.sol";
+import {ISoundEditionV1, EditionInfo} from "./interfaces/ISoundEditionV1.sol";
+import {IMetadataModule} from "./interfaces/IMetadataModule.sol";
 
-import { ISoundEditionV1, EditionInfo } from "./interfaces/ISoundEditionV1.sol";
-import { IMetadataModule } from "./interfaces/IMetadataModule.sol";
-
-import { ArweaveURILib } from "./utils/ArweaveURILib.sol";
+import {ArweaveURILib} from "./utils/ArweaveURILib.sol";
 
 /**
  * @title SoundEditionV1
  * @notice The Sound Edition contract - a creator-owned, modifiable implementation of ERC721A.
  */
-contract SoundEditionV1 is ISoundEditionV1, ERC721AQueryableUpgradeable, ERC721ABurnableUpgradeable, OwnableRoles {
+contract SoundEditionV1 is
+    ISoundEditionV1,
+    ERC721AQueryableUpgradeable,
+    ERC721ABurnableUpgradeable,
+    OwnableRoles
+{
     using ArweaveURILib for ArweaveURILib.URI;
 
     // =============================================================
@@ -181,7 +160,8 @@ contract SoundEditionV1 is ISoundEditionV1, ERC721AQueryableUpgradeable, ERC721A
 
         if (fundingRecipient_ == address(0)) revert InvalidFundingRecipient();
 
-        if (editionMaxMintableLower_ > editionMaxMintableUpper_) revert InvalidEditionMaxMintableRange();
+        if (editionMaxMintableLower_ > editionMaxMintableUpper_)
+            revert InvalidEditionMaxMintableRange();
 
         _initializeNameAndSymbol(name_, symbol_);
         ERC721AStorage.layout()._currentIndex = _startTokenId();
@@ -273,7 +253,11 @@ contract SoundEditionV1 is ISoundEditionV1, ERC721AQueryableUpgradeable, ERC721A
         unchecked {
             uint256 n = tokens.length;
             for (uint256 i; i != n; ++i) {
-                SafeTransferLib.safeTransfer(tokens[i], fundingRecipient, IERC20(tokens[i]).balanceOf(address(this)));
+                SafeTransferLib.safeTransfer(
+                    tokens[i],
+                    fundingRecipient,
+                    IERC20(tokens[i]).balanceOf(address(this))
+                );
             }
         }
     }
@@ -281,7 +265,11 @@ contract SoundEditionV1 is ISoundEditionV1, ERC721AQueryableUpgradeable, ERC721A
     /**
      * @inheritdoc ISoundEditionV1
      */
-    function setMetadataModule(address metadataModule_) external onlyRolesOrOwner(ADMIN_ROLE) onlyMetadataNotFrozen {
+    function setMetadataModule(address metadataModule_)
+        external
+        onlyRolesOrOwner(ADMIN_ROLE)
+        onlyMetadataNotFrozen
+    {
         metadataModule = metadataModule_;
 
         emit MetadataModuleSet(metadataModule_);
@@ -290,7 +278,11 @@ contract SoundEditionV1 is ISoundEditionV1, ERC721AQueryableUpgradeable, ERC721A
     /**
      * @inheritdoc ISoundEditionV1
      */
-    function setBaseURI(string memory baseURI_) external onlyRolesOrOwner(ADMIN_ROLE) onlyMetadataNotFrozen {
+    function setBaseURI(string memory baseURI_)
+        external
+        onlyRolesOrOwner(ADMIN_ROLE)
+        onlyMetadataNotFrozen
+    {
         _baseURIStorage.update(baseURI_);
 
         emit BaseURISet(baseURI_);
@@ -299,7 +291,11 @@ contract SoundEditionV1 is ISoundEditionV1, ERC721AQueryableUpgradeable, ERC721A
     /**
      * @inheritdoc ISoundEditionV1
      */
-    function setContractURI(string memory contractURI_) external onlyRolesOrOwner(ADMIN_ROLE) onlyMetadataNotFrozen {
+    function setContractURI(string memory contractURI_)
+        external
+        onlyRolesOrOwner(ADMIN_ROLE)
+        onlyMetadataNotFrozen
+    {
         _contractURIStorage.update(contractURI_);
 
         emit ContractURISet(contractURI_);
@@ -325,7 +321,11 @@ contract SoundEditionV1 is ISoundEditionV1, ERC721AQueryableUpgradeable, ERC721A
     /**
      * @inheritdoc ISoundEditionV1
      */
-    function setRoyalty(uint16 royaltyBPS_) external onlyRolesOrOwner(ADMIN_ROLE) onlyValidRoyaltyBPS(royaltyBPS_) {
+    function setRoyalty(uint16 royaltyBPS_)
+        external
+        onlyRolesOrOwner(ADMIN_ROLE)
+        onlyValidRoyaltyBPS(royaltyBPS_)
+    {
         royaltyBPS = royaltyBPS_;
         emit RoyaltySet(royaltyBPS_);
     }
@@ -333,25 +333,31 @@ contract SoundEditionV1 is ISoundEditionV1, ERC721AQueryableUpgradeable, ERC721A
     /**
      * @inheritdoc ISoundEditionV1
      */
-    function setEditionMaxMintableRange(uint32 editionMaxMintableLower_, uint32 editionMaxMintableUpper_)
-        external
-        onlyRolesOrOwner(ADMIN_ROLE)
-    {
+    function setEditionMaxMintableRange(
+        uint32 editionMaxMintableLower_,
+        uint32 editionMaxMintableUpper_
+    ) external onlyRolesOrOwner(ADMIN_ROLE) {
         if (mintConcluded()) revert MintHasConcluded();
 
         uint32 currentTotalMinted = uint32(_totalMinted());
 
         if (currentTotalMinted != 0) {
-            editionMaxMintableLower_ = uint32(FixedPointMathLib.max(editionMaxMintableLower_, currentTotalMinted));
+            editionMaxMintableLower_ = uint32(
+                FixedPointMathLib.max(editionMaxMintableLower_, currentTotalMinted)
+            );
 
-            editionMaxMintableUpper_ = uint32(FixedPointMathLib.max(editionMaxMintableUpper_, currentTotalMinted));
+            editionMaxMintableUpper_ = uint32(
+                FixedPointMathLib.max(editionMaxMintableUpper_, currentTotalMinted)
+            );
 
             // If the upper bound is larger than the current stored value, revert.
-            if (editionMaxMintableUpper_ > editionMaxMintableUpper) revert InvalidEditionMaxMintableRange();
+            if (editionMaxMintableUpper_ > editionMaxMintableUpper)
+                revert InvalidEditionMaxMintableRange();
         }
 
         // If the lower bound is larger than the upper bound, revert.
-        if (editionMaxMintableLower_ > editionMaxMintableUpper_) revert InvalidEditionMaxMintableRange();
+        if (editionMaxMintableLower_ > editionMaxMintableUpper_)
+            revert InvalidEditionMaxMintableRange();
 
         editionMaxMintableLower = editionMaxMintableLower_;
         editionMaxMintableUpper = editionMaxMintableUpper_;
@@ -373,7 +379,10 @@ contract SoundEditionV1 is ISoundEditionV1, ERC721AQueryableUpgradeable, ERC721A
     /**
      * @inheritdoc ISoundEditionV1
      */
-    function setMintRandomnessEnabled(bool mintRandomnessEnabled_) external onlyRolesOrOwner(ADMIN_ROLE) {
+    function setMintRandomnessEnabled(bool mintRandomnessEnabled_)
+        external
+        onlyRolesOrOwner(ADMIN_ROLE)
+    {
         if (_totalMinted() != 0) revert MintsAlreadyExist();
 
         if (mintRandomnessEnabled() != mintRandomnessEnabled_) {
@@ -530,7 +539,12 @@ contract SoundEditionV1 is ISoundEditionV1, ERC721AQueryableUpgradeable, ERC721A
     function royaltyInfo(
         uint256, // tokenId
         uint256 salePrice
-    ) external view override(IERC2981Upgradeable) returns (address fundingRecipient_, uint256 royaltyAmount) {
+    )
+        external
+        view
+        override(IERC2981Upgradeable)
+        returns (address fundingRecipient_, uint256 royaltyAmount)
+    {
         fundingRecipient_ = fundingRecipient;
         royaltyAmount = (salePrice * royaltyBPS) / _MAX_BPS;
     }
@@ -538,7 +552,12 @@ contract SoundEditionV1 is ISoundEditionV1, ERC721AQueryableUpgradeable, ERC721A
     /**
      * @inheritdoc IERC721AUpgradeable
      */
-    function name() public view override(ERC721AUpgradeable, IERC721AUpgradeable) returns (string memory) {
+    function name()
+        public
+        view
+        override(ERC721AUpgradeable, IERC721AUpgradeable)
+        returns (string memory)
+    {
         (string memory name_, ) = _loadNameAndSymbol();
         return name_;
     }
@@ -546,7 +565,12 @@ contract SoundEditionV1 is ISoundEditionV1, ERC721AQueryableUpgradeable, ERC721A
     /**
      * @inheritdoc IERC721AUpgradeable
      */
-    function symbol() public view override(ERC721AUpgradeable, IERC721AUpgradeable) returns (string memory) {
+    function symbol()
+        public
+        view
+        override(ERC721AUpgradeable, IERC721AUpgradeable)
+        returns (string memory)
+    {
         (, string memory symbol_) = _loadNameAndSymbol();
         return symbol_;
     }
@@ -676,7 +700,9 @@ contract SoundEditionV1 is ISoundEditionV1, ERC721AQueryableUpgradeable, ERC721A
                 return;
             }
             // Otherwise, pack them and store them into a single word.
-            _shortNameAndSymbol = bytes32(abi.encodePacked(uint8(nameLength), name_, uint8(symbolLength), symbol_));
+            _shortNameAndSymbol = bytes32(
+                abi.encodePacked(uint8(nameLength), name_, uint8(symbolLength), symbol_)
+            );
         }
     }
 
@@ -686,7 +712,11 @@ contract SoundEditionV1 is ISoundEditionV1, ERC721AQueryableUpgradeable, ERC721A
      * @return name_   Name of the collection.
      * @return symbol_ Symbol of the collection.
      */
-    function _loadNameAndSymbol() internal view returns (string memory name_, string memory symbol_) {
+    function _loadNameAndSymbol()
+        internal
+        view
+        returns (string memory name_, string memory symbol_)
+    {
         // Overflow impossible since max block gas limit bounds the length of the strings.
         unchecked {
             bytes32 packed = _shortNameAndSymbol;

@@ -2,12 +2,12 @@
 
 pragma solidity ^0.8.16;
 
-import { IERC165 } from "openzeppelin/utils/introspection/IERC165.sol";
-import { ISoundFeeRegistry } from "@core/interfaces/ISoundFeeRegistry.sol";
-import { IRangeEditionMinter, EditionMintData, MintInfo } from "./interfaces/IRangeEditionMinter.sol";
-import { BaseMinter } from "./BaseMinter.sol";
-import { IMinterModule } from "@core/interfaces/IMinterModule.sol";
-import { ISoundEditionV1 } from "@core/interfaces/ISoundEditionV1.sol";
+import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import {ISoundFeeRegistry} from "../core/interfaces/ISoundFeeRegistry.sol";
+import {IRangeEditionMinter, EditionMintData, MintInfo} from "./interfaces/IRangeEditionMinter.sol";
+import {BaseMinter} from "./BaseMinter.sol";
+import {IMinterModule} from "../core/interfaces/IMinterModule.sol";
+import {ISoundEditionV1} from "../core/interfaces/ISoundEditionV1.sol";
 
 /*
  * @title RangeEditionMinter
@@ -113,7 +113,11 @@ contract RangeEditionMinter is IRangeEditionMinter, BaseMinter {
         uint32 startTime,
         uint32 cutoffTime,
         uint32 endTime
-    ) public onlyEditionOwnerOrAdmin(edition) onlyValidCombinedTimeRange(startTime, cutoffTime, endTime) {
+    )
+        public
+        onlyEditionOwnerOrAdmin(edition)
+        onlyValidCombinedTimeRange(startTime, cutoffTime, endTime)
+    {
         // Set cutoffTime first, as its stored value gets validated later in the execution.
         EditionMintData storage data = _editionMintData[edition][mintId];
         data.cutoffTime = cutoffTime;
@@ -229,8 +233,15 @@ contract RangeEditionMinter is IRangeEditionMinter, BaseMinter {
     /**
      * @inheritdoc IERC165
      */
-    function supportsInterface(bytes4 interfaceId) public view override(IERC165, BaseMinter) returns (bool) {
-        return BaseMinter.supportsInterface(interfaceId) || interfaceId == type(IRangeEditionMinter).interfaceId;
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        override(IERC165, BaseMinter)
+        returns (bool)
+    {
+        return
+            BaseMinter.supportsInterface(interfaceId) ||
+            interfaceId == type(IRangeEditionMinter).interfaceId;
     }
 
     /**

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.16;
 
-import { IMinterModule } from "@core/interfaces/IMinterModule.sol";
+import {IMinterModule} from "../../core/interfaces/IMinterModule.sol";
 
 /**
  * @dev Data unique to a merkle drop mint.
@@ -97,7 +97,11 @@ interface IMerkleDropMinter is IMinterModule {
      * @param mintId                The mint ID.
      * @param maxMintablePerAccount The maximum number of tokens that can be minted per account.
      */
-    event MaxMintablePerAccountSet(address indexed edition, uint128 indexed mintId, uint32 maxMintablePerAccount);
+    event MaxMintablePerAccountSet(
+        address indexed edition,
+        uint128 indexed mintId,
+        uint32 maxMintablePerAccount
+    );
 
     /**
      * @dev Emitted when the `merkleRootHash` is changed for (`edition`, `mintId`).
@@ -105,7 +109,11 @@ interface IMerkleDropMinter is IMinterModule {
      * @param mintId         The mint ID.
      * @param merkleRootHash The merkle root hash of the entries.
      */
-    event MerkleRootHashSet(address indexed edition, uint128 indexed mintId, bytes32 merkleRootHash);
+    event MerkleRootHashSet(
+        address indexed edition,
+        uint128 indexed mintId,
+        bytes32 merkleRootHash
+    );
 
     // =============================================================
     //                            ERRORS

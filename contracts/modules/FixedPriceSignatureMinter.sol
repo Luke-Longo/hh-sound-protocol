@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.16;
 
-import { ECDSA } from "solady/utils/ECDSA.sol";
-import { IERC165 } from "openzeppelin/utils/introspection/IERC165.sol";
-import { BaseMinter } from "@modules/BaseMinter.sol";
-import { IFixedPriceSignatureMinter, EditionMintData, MintInfo } from "./interfaces/IFixedPriceSignatureMinter.sol";
-import { ISoundFeeRegistry } from "@core/interfaces/ISoundFeeRegistry.sol";
-import { IMinterModule } from "@core/interfaces/IMinterModule.sol";
-import { ISoundEditionV1 } from "@core/interfaces/ISoundEditionV1.sol";
+import {ECDSA} from "solady/src/utils/ECDSA.sol";
+import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import {BaseMinter} from "./BaseMinter.sol";
+import {IFixedPriceSignatureMinter, EditionMintData, MintInfo} from "./interfaces/IFixedPriceSignatureMinter.sol";
+import {ISoundFeeRegistry} from "../core/interfaces/ISoundFeeRegistry.sol";
+import {IMinterModule} from "../core/interfaces/IMinterModule.sol";
+import {ISoundEditionV1} from "../core/interfaces/ISoundEditionV1.sol";
 
 /**
  * @title IFixedPriceSignatureMinter
@@ -111,7 +111,15 @@ contract FixedPriceSignatureMinter is IFixedPriceSignatureMinter, BaseMinter {
 
         data.totalMinted = _incrementTotalMinted(data.totalMinted, quantity, data.maxMintable);
 
-        _validateSignatureAndClaim(signature, data.signer, claimTicket, edition, mintId, signedQuantity, affiliate);
+        _validateSignatureAndClaim(
+            signature,
+            data.signer,
+            claimTicket,
+            edition,
+            mintId,
+            signedQuantity,
+            affiliate
+        );
 
         _mint(edition, mintId, quantity, affiliate);
     }
@@ -175,7 +183,12 @@ contract FixedPriceSignatureMinter is IFixedPriceSignatureMinter, BaseMinter {
     /**
      * @inheritdoc IFixedPriceSignatureMinter
      */
-    function mintInfo(address edition, uint128 mintId) external view override returns (MintInfo memory) {
+    function mintInfo(address edition, uint128 mintId)
+        external
+        view
+        override
+        returns (MintInfo memory)
+    {
         BaseData memory baseData = _baseData[edition][mintId];
         EditionMintData storage mintData = _editionMintData[edition][mintId];
 
@@ -197,8 +210,15 @@ contract FixedPriceSignatureMinter is IFixedPriceSignatureMinter, BaseMinter {
     /**
      * @inheritdoc IERC165
      */
-    function supportsInterface(bytes4 interfaceId) public view override(IERC165, BaseMinter) returns (bool) {
-        return BaseMinter.supportsInterface(interfaceId) || interfaceId == type(IFixedPriceSignatureMinter).interfaceId;
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        override(IERC165, BaseMinter)
+        returns (bool)
+    {
+        return
+            BaseMinter.supportsInterface(interfaceId) ||
+            interfaceId == type(IFixedPriceSignatureMinter).interfaceId;
     }
 
     /**
@@ -231,7 +251,11 @@ contract FixedPriceSignatureMinter is IFixedPriceSignatureMinter, BaseMinter {
      */
     function DOMAIN_SEPARATOR() public view returns (bytes32 separator) {
         separator = keccak256(
-            abi.encode(keccak256("EIP712Domain(uint256 chainId,address edition)"), block.chainid, address(this))
+            abi.encode(
+                keccak256("EIP712Domain(uint256 chainId,address edition)"),
+                block.chainid,
+                address(this)
+            )
         );
     }
 
@@ -262,7 +286,16 @@ contract FixedPriceSignatureMinter is IFixedPriceSignatureMinter, BaseMinter {
             abi.encodePacked(
                 "\x19\x01",
                 DOMAIN_SEPARATOR(),
-                keccak256(abi.encode(MINT_TYPEHASH, msg.sender, mintId, claimTicket, signedQuantity, affiliate))
+                keccak256(
+                    abi.encode(
+                        MINT_TYPEHASH,
+                        msg.sender,
+                        mintId,
+                        claimTicket,
+                        signedQuantity,
+                        affiliate
+                    )
+                )
             )
         );
 
@@ -278,7 +311,9 @@ contract FixedPriceSignatureMinter is IFixedPriceSignatureMinter, BaseMinter {
         if (storedBit != 0) revert SignatureAlreadyUsed();
 
         // Flip the bit to 1 to indicate that the ticket has been claimed
-        _claimsBitmaps[edition][mintId][ticketGroupIdx] = ticketGroup | (uint256(1) << ticketGroupOffset);
+        _claimsBitmaps[edition][mintId][ticketGroupIdx] =
+            ticketGroup |
+            (uint256(1) << ticketGroupOffset);
     }
 
     /**

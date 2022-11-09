@@ -1,39 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.16;
 
-/*
-                 ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-               ▒███████████████████████████████████████████████████████████
-               ▒███████████████████████████████████████████████████████████
- ▒▓▓▓▓▓▓▓▓▓▓▓▓▓████████████████▓▓▓▓▓▓▓▓▓▓▓▓▓▓██████████████████████████████▓▒▒▒▒▒▒▒▒▒▒▒▒▒
- █████████████████████████████▓              ████████████████████████████████████████████
- █████████████████████████████▓              ████████████████████████████████████████████
- █████████████████████████████▓               ▒▒▒▒▒▒▒▒▒▒▒▒▒██████████████████████████████
- █████████████████████████████▓                            ▒█████████████████████████████
- █████████████████████████████▓                             ▒████████████████████████████
- █████████████████████████████████████████████████████████▓
- ███████████████████████████████████████████████████████████
- ███████████████████████████████████████████████████████████▒
-                              ███████████████████████████████████████████████████████████▒
-                              ▓██████████████████████████████████████████████████████████▒
-                               ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓███████████████████████████████▒
- █████████████████████████████                             ▒█████████████████████████████▒
- ██████████████████████████████                            ▒█████████████████████████████▒
- ██████████████████████████████▓▒▒▒▒▒▒▒▒▒▒▒▒▒              ▒█████████████████████████████▒
- ████████████████████████████████████████████▒             ▒█████████████████████████████▒
- ████████████████████████████████████████████▒             ▒█████████████████████████████▒
- ▒▒▒▒▒▒▒▒▒▒▒▒▒▒███████████████████████████████▓▓▓▓▓▓▓▓▓▓▓▓▓███████████████▓▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-               ▓█████████████████████████████████████████████████████████▒
-               ▓██████████████████████████████████████████████████████████
-*/
+import {Clones} from "@openzeppelin/contracts/proxy/Clones.sol";
 
-import { Clones } from "openzeppelin/proxy/Clones.sol";
+import {ISoundCreatorV1} from "./interfaces/ISoundCreatorV1.sol";
+import {ISoundEditionV1} from "./interfaces/ISoundEditionV1.sol";
+import {IMetadataModule} from "./interfaces/IMetadataModule.sol";
 
-import { ISoundCreatorV1 } from "./interfaces/ISoundCreatorV1.sol";
-import { ISoundEditionV1 } from "./interfaces/ISoundEditionV1.sol";
-import { IMetadataModule } from "./interfaces/IMetadataModule.sol";
-
-import { OwnableRoles } from "solady/auth/OwnableRoles.sol";
+import {OwnableRoles} from "solady/src/auth/OwnableRoles.sol";
 
 /**
  * @title SoundCreatorV1
@@ -54,7 +28,9 @@ contract SoundCreatorV1 is ISoundCreatorV1, OwnableRoles {
     //                          CONSTRUCTOR
     // =============================================================
 
-    constructor(address _soundEditionImplementation) implementationNotZero(_soundEditionImplementation) {
+    constructor(address _soundEditionImplementation)
+        implementationNotZero(_soundEditionImplementation)
+    {
         soundEditionImplementation = _soundEditionImplementation;
         _initializeOwner(msg.sender);
     }
@@ -73,7 +49,9 @@ contract SoundCreatorV1 is ISoundCreatorV1, OwnableRoles {
         bytes[] calldata data
     ) external returns (address soundEdition, bytes[] memory results) {
         // Create Sound Edition proxy.
-        soundEdition = payable(Clones.cloneDeterministic(soundEditionImplementation, _saltedSalt(msg.sender, salt)));
+        soundEdition = payable(
+            Clones.cloneDeterministic(soundEditionImplementation, _saltedSalt(msg.sender, salt))
+        );
 
         // Initialize proxy.
         assembly {
@@ -126,8 +104,16 @@ contract SoundCreatorV1 is ISoundCreatorV1, OwnableRoles {
     /**
      * @inheritdoc ISoundCreatorV1
      */
-    function soundEditionAddress(address by, bytes32 salt) external view returns (address addr, bool exists) {
-        addr = Clones.predictDeterministicAddress(soundEditionImplementation, _saltedSalt(by, salt), address(this));
+    function soundEditionAddress(address by, bytes32 salt)
+        external
+        view
+        returns (address addr, bool exists)
+    {
+        addr = Clones.predictDeterministicAddress(
+            soundEditionImplementation,
+            _saltedSalt(by, salt),
+            address(this)
+        );
         exists = addr.code.length > 0;
     }
 

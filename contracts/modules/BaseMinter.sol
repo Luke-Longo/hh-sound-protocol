@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.16;
 
-import { OwnableRoles } from "solady/auth/OwnableRoles.sol";
-import { ISoundEditionV1 } from "@core/interfaces/ISoundEditionV1.sol";
-import { IMinterModule } from "@core/interfaces/IMinterModule.sol";
-import { ISoundFeeRegistry } from "@core/interfaces/ISoundFeeRegistry.sol";
-import { IERC165 } from "openzeppelin/utils/introspection/IERC165.sol";
-import { SafeTransferLib } from "solady/utils/SafeTransferLib.sol";
-import { FixedPointMathLib } from "solady/utils/FixedPointMathLib.sol";
+import {OwnableRoles} from "solady/src/auth/OwnableRoles.sol";
+import {ISoundEditionV1} from "../core/interfaces/ISoundEditionV1.sol";
+import {IMinterModule} from "../core/interfaces/IMinterModule.sol";
+import {ISoundFeeRegistry} from "../core/interfaces/ISoundFeeRegistry.sol";
+import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import {SafeTransferLib} from "solady/src/utils/SafeTransferLib.sol";
+import {FixedPointMathLib} from "solady/src/utils/FixedPointMathLib.sol";
 
 /**
  * @title Minter Base
@@ -175,7 +175,9 @@ abstract contract BaseMinter is IMinterModule {
      * @inheritdoc IERC165
      */
     function supportsInterface(bytes4 interfaceId) public view virtual returns (bool) {
-        return interfaceId == type(IMinterModule).interfaceId || interfaceId == this.supportsInterface.selector;
+        return
+            interfaceId == type(IMinterModule).interfaceId ||
+            interfaceId == this.supportsInterface.selector;
     }
 
     /**
@@ -279,7 +281,8 @@ abstract contract BaseMinter is IMinterModule {
         {
             uint32 startTime = baseData.startTime;
             uint32 endTime = baseData.endTime;
-            if (block.timestamp < startTime) revert MintNotOpen(block.timestamp, startTime, endTime);
+            if (block.timestamp < startTime)
+                revert MintNotOpen(block.timestamp, startTime, endTime);
             if (block.timestamp > endTime) revert MintNotOpen(block.timestamp, startTime, endTime);
             if (baseData.mintPaused) revert MintPaused();
         }
@@ -301,7 +304,8 @@ abstract contract BaseMinter is IMinterModule {
                 // Compute the affiliate fee.
                 // Won't overflow, as `remainingPayment` is 128 bits, and `affiliateFeeBPS` is 16 bits.
                 affiliateFee = uint128(
-                    (uint256(remainingPayment) * uint256(baseData.affiliateFeeBPS)) / uint256(_MAX_BPS)
+                    (uint256(remainingPayment) * uint256(baseData.affiliateFeeBPS)) /
+                        uint256(_MAX_BPS)
                 );
                 // Deduct the affiliate fee from the remaining payment.
                 // Won't underflow as `affiliateFee <= remainingPayment`.
@@ -320,7 +324,7 @@ abstract contract BaseMinter is IMinterModule {
             mintId,
             msg.sender,
             // Need to put this call here to avoid stack-too-deep error (it returns fromTokenId)
-            uint32(ISoundEditionV1(edition).mint{ value: remainingPayment }(msg.sender, quantity)),
+            uint32(ISoundEditionV1(edition).mint{value: remainingPayment}(msg.sender, quantity)),
             quantity,
             requiredEtherValue,
             platformFee,

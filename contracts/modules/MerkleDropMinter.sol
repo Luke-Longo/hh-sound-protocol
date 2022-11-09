@@ -2,13 +2,13 @@
 
 pragma solidity ^0.8.16;
 
-import { MerkleProofLib } from "solady/utils/MerkleProofLib.sol";
-import { IERC165 } from "openzeppelin/utils/introspection/IERC165.sol";
-import { ISoundFeeRegistry } from "@core/interfaces/ISoundFeeRegistry.sol";
-import { BaseMinter } from "@modules/BaseMinter.sol";
-import { IMerkleDropMinter, EditionMintData, MintInfo } from "./interfaces/IMerkleDropMinter.sol";
-import { IMinterModule } from "@core/interfaces/IMinterModule.sol";
-import { ISoundEditionV1 } from "@core/interfaces/ISoundEditionV1.sol";
+import {MerkleProofLib} from "solady/src/utils/MerkleProofLib.sol";
+import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import {ISoundFeeRegistry} from "../core/interfaces/ISoundFeeRegistry.sol";
+import {BaseMinter} from "./BaseMinter.sol";
+import {IMerkleDropMinter, EditionMintData, MintInfo} from "./interfaces/IMerkleDropMinter.sol";
+import {IMinterModule} from "../core/interfaces/IMinterModule.sol";
+import {ISoundEditionV1} from "../core/interfaces/ISoundEditionV1.sol";
 
 /**
  * @title MerkleDropMinter
@@ -87,7 +87,11 @@ contract MerkleDropMinter is IMerkleDropMinter, BaseMinter {
 
         // Increase `totalMinted` by `requestedQuantity`.
         // Require that the increased value does not exceed `maxMintable`.
-        data.totalMinted = _incrementTotalMinted(data.totalMinted, requestedQuantity, data.maxMintable);
+        data.totalMinted = _incrementTotalMinted(
+            data.totalMinted,
+            requestedQuantity,
+            data.maxMintable
+        );
 
         bytes32 leaf = keccak256(abi.encodePacked(msg.sender));
         bool valid = MerkleProofLib.verify(merkleProof, data.merkleRootHash, leaf);
@@ -98,7 +102,8 @@ contract MerkleDropMinter is IMerkleDropMinter, BaseMinter {
             uint256 numberMinted = ISoundEditionV1(edition).numberMinted(msg.sender);
             // Won't overflow. The total number of tokens minted in `edition` won't exceed `type(uint32).max`,
             // and `quantity` has 32 bits.
-            if (numberMinted + requestedQuantity > data.maxMintablePerAccount) revert ExceedsMaxPerAccount();
+            if (numberMinted + requestedQuantity > data.maxMintablePerAccount)
+                revert ExceedsMaxPerAccount();
         }
 
         _mint(edition, mintId, requestedQuantity, affiliate);
@@ -201,8 +206,15 @@ contract MerkleDropMinter is IMerkleDropMinter, BaseMinter {
     /**
      * @inheritdoc IERC165
      */
-    function supportsInterface(bytes4 interfaceId) public view override(IERC165, BaseMinter) returns (bool) {
-        return BaseMinter.supportsInterface(interfaceId) || interfaceId == type(IMerkleDropMinter).interfaceId;
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        override(IERC165, BaseMinter)
+        returns (bool)
+    {
+        return
+            BaseMinter.supportsInterface(interfaceId) ||
+            interfaceId == type(IMerkleDropMinter).interfaceId;
     }
 
     /**

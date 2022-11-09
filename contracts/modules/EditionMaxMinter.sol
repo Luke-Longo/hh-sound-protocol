@@ -2,12 +2,12 @@
 
 pragma solidity ^0.8.16;
 
-import { IERC165 } from "openzeppelin/utils/introspection/IERC165.sol";
-import { ISoundFeeRegistry } from "@core/interfaces/ISoundFeeRegistry.sol";
-import { IEditionMaxMinter, EditionMintData, MintInfo } from "./interfaces/IEditionMaxMinter.sol";
-import { BaseMinter } from "./BaseMinter.sol";
-import { IMinterModule } from "@core/interfaces/IMinterModule.sol";
-import { ISoundEditionV1, EditionInfo } from "@core/interfaces/ISoundEditionV1.sol";
+import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import {ISoundFeeRegistry} from "../core/interfaces/ISoundFeeRegistry.sol";
+import {IEditionMaxMinter, EditionMintData, MintInfo} from "./interfaces/IEditionMaxMinter.sol";
+import {BaseMinter} from "./BaseMinter.sol";
+import {IMinterModule} from "../core/interfaces/IMinterModule.sol";
+import {ISoundEditionV1, EditionInfo} from "../core/interfaces/ISoundEditionV1.sol";
 
 /*
  * @title EditionMaxMinter
@@ -135,7 +135,11 @@ contract EditionMaxMinter is IEditionMaxMinter, BaseMinter {
     /**
      * @inheritdoc IEditionMaxMinter
      */
-    function mintInfo(address edition, uint128 mintId) external view returns (MintInfo memory info) {
+    function mintInfo(address edition, uint128 mintId)
+        external
+        view
+        returns (MintInfo memory info)
+    {
         BaseData memory baseData = _baseData[edition][mintId];
         EditionMintData storage mintData = _editionMintData[edition][mintId];
 
@@ -155,8 +159,15 @@ contract EditionMaxMinter is IEditionMaxMinter, BaseMinter {
     /**
      * @inheritdoc IERC165
      */
-    function supportsInterface(bytes4 interfaceId) public view override(IERC165, BaseMinter) returns (bool) {
-        return BaseMinter.supportsInterface(interfaceId) || interfaceId == type(IEditionMaxMinter).interfaceId;
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        override(IERC165, BaseMinter)
+        returns (bool)
+    {
+        return
+            BaseMinter.supportsInterface(interfaceId) ||
+            interfaceId == type(IEditionMaxMinter).interfaceId;
     }
 
     /**

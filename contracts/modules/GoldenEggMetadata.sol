@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.16;
 
-import { LibString } from "solady/utils/LibString.sol";
-import { ISoundEditionV1 } from "@core/interfaces/ISoundEditionV1.sol";
-import { IGoldenEggMetadata } from "@modules/interfaces/IGoldenEggMetadata.sol";
+import {LibString} from "solady/src/utils/LibString.sol";
+import {ISoundEditionV1} from "../core/interfaces/ISoundEditionV1.sol";
+import {IGoldenEggMetadata} from "./interfaces/IGoldenEggMetadata.sol";
 
 contract GoldenEggMetadata is IGoldenEggMetadata {
     /**
@@ -17,7 +17,8 @@ contract GoldenEggMetadata is IGoldenEggMetadata {
             return bytes(baseURI).length != 0 ? string.concat(baseURI, "goldenEgg") : "";
         }
 
-        return bytes(baseURI).length != 0 ? string.concat(baseURI, LibString.toString(tokenId)) : "";
+        return
+            bytes(baseURI).length != 0 ? string.concat(baseURI, LibString.toString(tokenId)) : "";
     }
 
     /**

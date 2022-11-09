@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.16;
 
-import { IMinterModule } from "@core/interfaces/IMinterModule.sol";
+import {IMinterModule} from "../../core/interfaces/IMinterModule.sol";
 
 /**
  * @dev Data unique to a edition max mint.
@@ -72,7 +72,11 @@ interface IEditionMaxMinter is IMinterModule {
      * @param mintId                The mint ID.
      * @param maxMintablePerAccount The maximum number of tokens that can be minted per account.
      */
-    event MaxMintablePerAccountSet(address indexed edition, uint128 indexed mintId, uint32 maxMintablePerAccount);
+    event MaxMintablePerAccountSet(
+        address indexed edition,
+        uint128 indexed mintId,
+        uint32 maxMintablePerAccount
+    );
 
     // =============================================================
     //                            ERRORS

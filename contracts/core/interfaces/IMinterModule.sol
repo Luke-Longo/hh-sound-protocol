@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.16;
 
-import { IERC165 } from "openzeppelin/utils/introspection/IERC165.sol";
-import { ISoundFeeRegistry } from "./ISoundFeeRegistry.sol";
+import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import {ISoundFeeRegistry} from "./ISoundFeeRegistry.sol";
 
 /**
  * @title IMinterModule
@@ -60,7 +60,12 @@ interface IMinterModule is IERC165 {
      * @param startTime The start time of the mint.
      * @param endTime   The end time of the mint.
      */
-    event TimeRangeSet(address indexed edition, uint128 indexed mintId, uint32 startTime, uint32 endTime);
+    event TimeRangeSet(
+        address indexed edition,
+        uint128 indexed mintId,
+        uint32 startTime,
+        uint32 endTime
+    );
 
     /**
      * @notice Emitted when the `affiliateFeeBPS` is updated.

@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.16;
 
-import { IERC721AUpgradeable } from "chiru-labs/ERC721A-Upgradeable/IERC721AUpgradeable.sol";
-import { IERC2981Upgradeable } from "openzeppelin-upgradeable/interfaces/IERC2981Upgradeable.sol";
-import { IERC165Upgradeable } from "openzeppelin-upgradeable/utils/introspection/IERC165Upgradeable.sol";
+import {IERC721AUpgradeable} from "erc721a-upgradeable/contracts/IERC721AUpgradeable.sol";
+import {IERC2981Upgradeable} from "@openzeppelin/contracts-upgradeable/interfaces/IERC2981Upgradeable.sol";
+import {IERC165Upgradeable} from "@openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable.sol";
 
-import { IMetadataModule } from "./IMetadataModule.sol";
+import {IMetadataModule} from "./IMetadataModule.sol";
 
 /**
  * @dev The information pertaining to this edition.
@@ -105,7 +105,10 @@ interface ISoundEditionV1 is IERC721AUpgradeable, IERC2981Upgradeable {
      * @param editionMaxMintableLower_ The lower limit of the maximum number of tokens that can be minted.
      * @param editionMaxMintableUpper_ The upper limit of the maximum number of tokens that can be minted.
      */
-    event EditionMaxMintableRangeSet(uint32 editionMaxMintableLower_, uint32 editionMaxMintableUpper_);
+    event EditionMaxMintableRangeSet(
+        uint32 editionMaxMintableLower_,
+        uint32 editionMaxMintableUpper_
+    );
 
     /**
      * @dev Emitted when the edition's cutoff time set.
@@ -286,7 +289,9 @@ interface ISoundEditionV1 is IERC721AUpgradeable, IERC2981Upgradeable {
      * @param quantity     Number of tokens to mint.
      * @return fromTokenId The first token ID minted.
      */
-    function airdrop(address[] calldata to, uint256 quantity) external returns (uint256 fromTokenId);
+    function airdrop(address[] calldata to, uint256 quantity)
+        external
+        returns (uint256 fromTokenId);
 
     /**
      * @dev Withdraws collected ETH royalties to the fundingRecipient.
@@ -366,7 +371,10 @@ interface ISoundEditionV1 is IERC721AUpgradeable, IERC2981Upgradeable {
      * @param editionMaxMintableLower_ The lower limit of the maximum number of tokens that can be minted.
      * @param editionMaxMintableUpper_ The upper limit of the maximum number of tokens that can be minted.
      */
-    function setEditionMaxMintableRange(uint32 editionMaxMintableLower_, uint32 editionMaxMintableUpper_) external;
+    function setEditionMaxMintableRange(
+        uint32 editionMaxMintableLower_,
+        uint32 editionMaxMintableUpper_
+    ) external;
 
     /**
      * @dev Sets the timestamp after which, the `editionMaxMintable` drops
