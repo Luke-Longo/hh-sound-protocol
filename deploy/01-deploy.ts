@@ -7,13 +7,13 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
     const { deployer } = await getNamedAccounts()
 
-    await deploy("TestMe", {
+    await deploy("SoundCreatorV1", {
         from: deployer,
-        args: [],
+        args: [deployer],
         log: true,
     })
 }
 
 export default func
 
-func.tags = ["TestMe"]
+func.tags = ["SoundCreatorV1"]
